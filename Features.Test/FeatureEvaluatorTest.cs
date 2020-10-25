@@ -1,4 +1,4 @@
-namespace Features.Test
+namespace Spritely.Features.Test
 {
     using FluentAssertions;
     using NSubstitute;

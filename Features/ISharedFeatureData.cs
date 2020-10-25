@@ -1,4 +1,4 @@
-﻿namespace Features
+﻿namespace Spritely.Features
 {
     /// <summary>
     /// This is a marker interface for any types that provide data that should be available to all features.

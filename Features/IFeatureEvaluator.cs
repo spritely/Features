@@ -1,4 +1,4 @@
-﻿namespace Features
+﻿namespace Spritely.Features
 {
     using System;
     using System.Threading.Tasks;
