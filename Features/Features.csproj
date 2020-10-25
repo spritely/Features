@@ -5,6 +5,13 @@
     <RootNamespace>Spritely.Features</RootNamespace>
     <AssemblyName>Spritely.Features</AssemblyName>
     <Version>0.1.0</Version>
+    <Authors>Spritely Developers</Authors>
+    <RepositoryUrl>https://github.com/spritely/Features</RepositoryUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>An abstraction layer for adding feature toggles to a .NET application independent of a particular provider that emphasizes clean and flexible custom feature toggles for your application.</Description>
+    <Copyright>Copyright (C) 2020</Copyright>
+    <PackageTags>Spritely;Features;Feature Toggles;Feature Flags</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
