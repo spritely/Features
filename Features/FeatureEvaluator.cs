@@ -38,8 +38,37 @@
         /// Determines if the feature is currently on or off.
         /// </summary>
         /// <param name="name">The name of the feature.</param>
+        /// <param name="defaultValue">Default value if feature is indeterminate.</param>
         /// <returns>The current value of the feature (on or off).</returns>
-        public Task<bool> IsOnAsync(string name) => _resolver.IsOnAsync(name, _allData);
+        public Task<bool> IsOnAsync(string name, bool defaultValue = false) => _resolver.IsOnAsync(name, _allData, defaultValue);
+
+        /// <summary>
+        /// Checks if the value of a feature matches the value of the supplied argument.
+        /// Throws an InvalidOperationException if the underlying provider does not support string based features.
+        /// </summary>
+        /// <param name="name">The name of the feature.</param>
+        /// <param name="value">The value to match against.</param>
+        /// <param name="comparison">The type of string comparison to use when matching. Defaults to Ordinal.</param>
+        /// <param name="defaultValue">Default value to use if feature is indeterminate. Defaults to false.</param>
+        /// <returns>The current value (on or off) of the feature.</returns>
+        public Task<bool> MatchesAsync(string name, string value, StringComparison comparison = StringComparison.Ordinal, bool defaultValue = false)
+            => _resolver.MatchesAsync(name, _allData, value, comparison, defaultValue);
+
+        /// <summary>
+        /// Checks if the value of a feature matches the value of the supplied argument.
+        /// Throws an InvalidOperationException if the underlying provider does not support string based features.
+        /// </summary>
+        /// <param name="name">The name of the feature.</param>
+        /// <param name="value">The value to match against.</param>
+        /// <param name="comparison">The type of string comparison to use when matching. Defaults to Ordinal.</param>
+        /// <param name="defaultValue">Default value to use if feature is indeterminate. Defaults to false.</param>
+        /// <returns>The current value (on or off) of the feature.</returns>
+        public Task<bool> MatchesAsync<T>(string name, T value, StringComparison comparison = StringComparison.Ordinal, bool defaultValue = false)
+            where T : Enum
+        {
+            var stringValue = Enum.GetName(typeof(T), value);
+            return _resolver.MatchesAsync(name, _allData, stringValue, comparison, defaultValue);
+        }
 
         /// <summary>
         /// Adds data to the feature that can be used to help determine the outcome of the toggle.

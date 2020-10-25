@@ -58,6 +58,34 @@ namespace Features.Test
         }
 
         [Fact]
+        public async Task IsOnAsyncAsync_sends_false_defaultValue_to_resolver_by_default()
+        {
+            var resolver = Substitute.For<IFeatureResolver>();
+            var evaluator = new FeatureEvaluator(resolver);
+
+            await evaluator.IsOnAsync("ignored");
+            await resolver.Received().IsOnAsync(
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, object>>(),
+                Arg.Is(false));
+        }
+
+        [Fact]
+        public async Task IsOnAsync_sends_defaultValue_to_resolver()
+        {
+            var resolver = Substitute.For<IFeatureResolver>();
+            var evaluator = new FeatureEvaluator(resolver);
+            var givenDefaultValue = true;
+
+            await evaluator.IsOnAsync("ignored", givenDefaultValue);
+            await resolver.Received().IsOnAsync(Arg.Any<string>(), Arg.Any<IDictionary<string, object>>(), Arg.Is(givenDefaultValue));
+
+            givenDefaultValue = false;
+            await evaluator.IsOnAsync("ignored", givenDefaultValue);
+            await resolver.Received().IsOnAsync(Arg.Any<string>(), Arg.Any<IDictionary<string, object>>(), Arg.Is(givenDefaultValue));
+        }
+
+        [Fact]
         public async Task WithT_adds_data_for_resolver()
         {
             var resolver = Substitute.For<IFeatureResolver>();
@@ -254,6 +282,263 @@ namespace Features.Test
                 d["LastName"].ToString() == "Adams" &&
                 d["CountryName"].ToString() == "USA"
             ));
+        }
+
+        [Fact]
+        public async Task MatchesAsync_returns_result_of_resolver_MatchesAsync()
+        {
+            var resolver = Substitute.For<IFeatureResolver>();
+            var evaluator = new FeatureEvaluator(resolver);
+
+            resolver.MatchesAsync(Arg.Any<string>(), Arg.Any<IDictionary<string, object>>(), Arg.Any<string>()).Returns(false);
+            var result = await evaluator.MatchesAsync("ignored", "ignored");
+            result.Should().BeFalse();
+
+            resolver.MatchesAsync(Arg.Any<string>(), Arg.Any<IDictionary<string, object>>(), Arg.Any<string>()).Returns(true);
+            result = await evaluator.MatchesAsync("ignored", "ignored");
+            result.Should().BeTrue();
+        }
+        
+        [Fact]
+        public async Task MatchesAsync_sends_name_to_resolver()
+        {
+            var resolver = Substitute.For<IFeatureResolver>();
+            var evaluator = new FeatureEvaluator(resolver);
+            var givenName = "Feature Name";
+
+            await evaluator.MatchesAsync(givenName, "ignored");
+
+            await resolver.Received().MatchesAsync(givenName, Arg.Any<IDictionary<string, object>>(), Arg.Any<string>());
+        }
+
+        [Fact]
+        public async Task MatchesAsync_sends_data_to_resolver()
+        {
+            var resolver = Substitute.For<IFeatureResolver>();
+            var evaluator = new FeatureEvaluator(resolver, new List<ISharedFeatureData> { new Country { CountryName = "USA" } });
+
+            await evaluator.MatchesAsync("ignored", "ignored");
+
+            await resolver.Received().MatchesAsync(Arg.Any<string>(), Arg.Is<IDictionary<string, object>>(d =>
+                d.Count == 1 &&
+                d.ContainsKey("CountryName") &&
+                d["CountryName"].ToString() == "USA"
+            ), Arg.Any<string>());
+        }
+
+        [Fact]
+        public async Task MatchesAsync_sends_value_to_resolver()
+        {
+            var resolver = Substitute.For<IFeatureResolver>();
+            var evaluator = new FeatureEvaluator(resolver);
+            var givenValue = "Match this";
+
+            await evaluator.MatchesAsync("ignored", givenValue);
+
+            await resolver.Received().MatchesAsync(Arg.Any<string>(), Arg.Any<IDictionary<string, object>>(), givenValue);
+        }
+
+        [Fact]
+        public async Task MatchesAsync_sends_Ordinal_comparison_to_resolver_by_default()
+        {
+            var resolver = Substitute.For<IFeatureResolver>();
+            var evaluator = new FeatureEvaluator(resolver);
+
+            await evaluator.MatchesAsync("ignored", "ignored");
+
+            await resolver.Received().MatchesAsync(
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, object>>(),
+                Arg.Any<string>(),
+                Arg.Is<StringComparison>(c => c == StringComparison.Ordinal));
+        }
+
+        [Fact]
+        public async Task MatchesAsync_sends_comparison_to_resolver()
+        {
+            var resolver = Substitute.For<IFeatureResolver>();
+            var evaluator = new FeatureEvaluator(resolver);
+            var givenComparison = StringComparison.CurrentCultureIgnoreCase;
+
+            await evaluator.MatchesAsync("ignored", "ignored", givenComparison);
+
+            await resolver.Received().MatchesAsync(
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, object>>(),
+                Arg.Any<string>(),
+                Arg.Is<StringComparison>(c => c == givenComparison));
+        }
+
+        [Fact]
+        public async Task MatchesAsync_sends_false_defaultValue_to_resolver_by_default()
+        {
+            var resolver = Substitute.For<IFeatureResolver>();
+            var evaluator = new FeatureEvaluator(resolver);
+
+            await evaluator.MatchesAsync("ignored", "ignored");
+            await resolver.Received().MatchesAsync(
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, object>>(),
+                Arg.Any<string>(),
+                Arg.Any<StringComparison>(),
+                Arg.Is(false));
+        }
+
+        [Fact]
+        public async Task MatchesAsync_sends_defaultValue_to_resolver()
+        {
+            var resolver = Substitute.For<IFeatureResolver>();
+            var evaluator = new FeatureEvaluator(resolver);
+            var givenDefaultValue = true;
+
+            await evaluator.MatchesAsync("ignored", "ignored", defaultValue: givenDefaultValue);
+            await resolver.Received().MatchesAsync(
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, object>>(),
+                Arg.Any<string>(),
+                Arg.Any<StringComparison>(),
+                Arg.Is(givenDefaultValue));
+
+            givenDefaultValue = false;
+            await evaluator.MatchesAsync("ignored", "ignored", defaultValue: givenDefaultValue);
+            await resolver.Received().MatchesAsync(
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, object>>(),
+                Arg.Any<string>(),
+                Arg.Any<StringComparison>(),
+                Arg.Is(givenDefaultValue));
+        }
+
+        [Fact]
+        public async Task MatchesAsyncT_returns_result_of_resolver_MatchesAsync()
+        {
+            var resolver = Substitute.For<IFeatureResolver>();
+            var evaluator = new FeatureEvaluator(resolver);
+
+            resolver.MatchesAsync(Arg.Any<string>(), Arg.Any<IDictionary<string, object>>(), Arg.Any<string>()).Returns(false);
+            var result = await evaluator.MatchesAsync("ignored", Presidents.GeorgeWashington);
+            result.Should().BeFalse();
+
+            resolver.MatchesAsync(Arg.Any<string>(), Arg.Any<IDictionary<string, object>>(), Arg.Any<string>()).Returns(true);
+            result = await evaluator.MatchesAsync("ignored", Presidents.JohnAdams);
+            result.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task MatchesAsyncT_sends_name_to_resolver()
+        {
+            var resolver = Substitute.For<IFeatureResolver>();
+            var evaluator = new FeatureEvaluator(resolver);
+            var givenName = "Feature Name";
+
+            await evaluator.MatchesAsync(givenName, Presidents.GeorgeWashington);
+
+            await resolver.Received().MatchesAsync(givenName, Arg.Any<IDictionary<string, object>>(), Arg.Any<string>());
+        }
+
+        [Fact]
+        public async Task MatchesAsyncT_sends_data_to_resolver()
+        {
+            var resolver = Substitute.For<IFeatureResolver>();
+            var evaluator = new FeatureEvaluator(resolver, new List<ISharedFeatureData> { new Country { CountryName = "USA" } });
+
+            await evaluator.MatchesAsync("ignored", Presidents.JohnAdams);
+
+            await resolver.Received().MatchesAsync(Arg.Any<string>(), Arg.Is<IDictionary<string, object>>(d =>
+                d.Count == 1 &&
+                d.ContainsKey("CountryName") &&
+                d["CountryName"].ToString() == "USA"
+            ), Arg.Any<string>());
+        }
+
+        [Fact]
+        public async Task MatchesAsyncT_sends_value_to_resolver()
+        {
+            var resolver = Substitute.For<IFeatureResolver>();
+            var evaluator = new FeatureEvaluator(resolver);
+            var givenValue = Presidents.ThomasJefferson;
+
+            await evaluator.MatchesAsync("ignored", givenValue);
+
+            await resolver.Received().MatchesAsync(Arg.Any<string>(), Arg.Any<IDictionary<string, object>>(), "ThomasJefferson");
+        }
+
+        [Fact]
+        public async Task MatchesAsyncT_sends_Ordinal_comparison_to_resolver_by_default()
+        {
+            var resolver = Substitute.For<IFeatureResolver>();
+            var evaluator = new FeatureEvaluator(resolver);
+
+            await evaluator.MatchesAsync("ignored", Presidents.GeorgeWashington);
+
+            await resolver.Received().MatchesAsync(
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, object>>(),
+                Arg.Any<string>(),
+                Arg.Is<StringComparison>(c => c == StringComparison.Ordinal));
+        }
+
+        [Fact]
+        public async Task MatchesAsyncT_sends_comparison_to_resolver()
+        {
+            var resolver = Substitute.For<IFeatureResolver>();
+            var evaluator = new FeatureEvaluator(resolver);
+            var givenComparison = StringComparison.CurrentCultureIgnoreCase;
+
+            await evaluator.MatchesAsync("ignored", Presidents.JohnAdams, givenComparison);
+
+            await resolver.Received().MatchesAsync(
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, object>>(),
+                Arg.Any<string>(),
+                Arg.Is<StringComparison>(c => c == givenComparison));
+        }
+
+        [Fact]
+        public async Task MatchesAsyncT_sends_false_defaultValue_to_resolver_by_default()
+        {
+            var resolver = Substitute.For<IFeatureResolver>();
+            var evaluator = new FeatureEvaluator(resolver);
+
+            await evaluator.MatchesAsync("ignored", Presidents.ThomasJefferson);
+            await resolver.Received().MatchesAsync(
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, object>>(),
+                Arg.Any<string>(),
+                Arg.Any<StringComparison>(),
+                Arg.Is(false));
+        }
+
+        [Fact]
+        public async Task MatchesAsyncT_sends_defaultValue_to_resolver()
+        {
+            var resolver = Substitute.For<IFeatureResolver>();
+            var evaluator = new FeatureEvaluator(resolver);
+            var givenDefaultValue = true;
+
+            await evaluator.MatchesAsync("ignored", Presidents.GeorgeWashington, defaultValue: givenDefaultValue);
+            await resolver.Received().MatchesAsync(
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, object>>(),
+                Arg.Any<string>(),
+                Arg.Any<StringComparison>(),
+                Arg.Is(givenDefaultValue));
+
+            givenDefaultValue = false;
+            await evaluator.MatchesAsync("ignored", Presidents.JohnAdams, defaultValue: givenDefaultValue);
+            await resolver.Received().MatchesAsync(
+                Arg.Any<string>(),
+                Arg.Any<IDictionary<string, object>>(),
+                Arg.Any<string>(),
+                Arg.Any<StringComparison>(),
+                Arg.Is(givenDefaultValue));
+        }
+
+        public enum Presidents : int
+        {
+            GeorgeWashington = 1,
+            JohnAdams,
+            ThomasJefferson
         }
 
         public class Person : ISharedFeatureData
