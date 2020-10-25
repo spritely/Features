@@ -178,7 +178,7 @@ namespace Spritely.Features.Test
         [Fact]
         public async Task SharedFeatureData_automatically_resolves_when_registered_in_container()
         {
-            var expectedAssemblyVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            var expectedAssemblyVersion = Assembly.GetEntryAssembly().GetName().Version.ToString();
             var resolver = Substitute.For<IFeatureResolver>();
             var logger = Logger.For<FeatureSelector<SimpleTestFeature, NewGetSomething, OldGetSomething, IGetSomething>>();
             var containerBuilder = new ContainerBuilder();

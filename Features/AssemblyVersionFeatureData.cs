@@ -9,7 +9,7 @@
     public class AssemblyVersionFeatureData : ISharedFeatureData
     {
         // Initialize one time only to avoid additional reflection penalty. 
-        private static AssemblyName assemblyName = Assembly.GetExecutingAssembly().GetName();
+        private static AssemblyName assemblyName = Assembly.GetEntryAssembly().GetName();
 
         /// <summary>
         /// The version of the currently executing assembly.

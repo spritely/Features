@@ -16,7 +16,7 @@ namespace Spritely.Features.Test
             var featureData = new MachineNameFeatureData();
             var evaluator = new FeatureEvaluator(resolver, new List<ISharedFeatureData>() { new AssemblyVersionFeatureData() });
             var feature = new TestAssemblyVersionFeatureData(evaluator);
-            var expectedValue = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            var expectedValue = Assembly.GetEntryAssembly().GetName().Version.ToString();
 
             await feature.IsOnAsync();
 
